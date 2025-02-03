@@ -1,0 +1,9 @@
+{
+  "name": "eenytdwn-functions",
+  "version": "1.0.0",
+  "description": "Netlify Functions for YouTube video downloader",
+  "main": "index.js",
+  "dependencies": {
+    "ytdl-core": "^4.11.5"
+  }
+} 

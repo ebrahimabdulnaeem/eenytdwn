@@ -1,26 +1,24 @@
 [build]
   base = "client"
   publish = "build"
-  command = "npm run build"
+  command = "cd ../server/functions && npm install && cd ../../client && npm run build"
 
 [functions]
   directory = "server/functions"
+  node_bundler = "esbuild"
 
-# Handle API requests first
 [[redirects]]
   from = "/api/*"
   to = "/.netlify/functions/:splat"
   status = 200
   force = true
 
-# Handle static assets
 [[redirects]]
   from = "/static/*"
   to = "/static/:splat"
   status = 200
   force = true
 
-# Handle all other routes for SPA
 [[redirects]]
   from = "/*"
   to = "/index.html"
