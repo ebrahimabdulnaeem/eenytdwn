@@ -39,7 +39,7 @@ api.interceptors.response.use(
 export const getVideoInfo = async (url) => {
   try {
     console.log('Fetching video info for URL:', url);
-    const response = await api.get(`/.netlify/functions/info`, {
+    const response = await api.get(`/api/info`, {
       params: {
         url: url
       }
@@ -72,7 +72,7 @@ export const getVideoInfo = async (url) => {
 
 export const downloadVideo = async (url, itag, title) => {
   try {
-    const response = await api.get(`/.netlify/functions/download`, {
+    const response = await api.get(`/api/download`, {
       params: {
         url: url,
         itag: itag

@@ -6,12 +6,21 @@
 [functions]
   directory = "server"
 
+# Handle API requests first
 [[redirects]]
-  from = "/.netlify/functions/*"
+  from = "/api/*"
   to = "/.netlify/functions/:splat"
   status = 200
   force = true
 
+# Handle static assets
+[[redirects]]
+  from = "/static/*"
+  to = "/static/:splat"
+  status = 200
+  force = true
+
+# Handle all other routes for SPA
 [[redirects]]
   from = "/*"
   to = "/index.html"
