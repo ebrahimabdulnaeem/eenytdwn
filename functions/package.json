@@ -1,0 +1,8 @@
+{
+  "name": "youtube-downloader-functions",
+  "version": "1.0.0",
+  "description": "Netlify Functions for YouTube Downloader",
+  "dependencies": {
+    "youtube-dl-exec": "^2.4.6"
+  }
+} 

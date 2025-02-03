@@ -37,11 +37,11 @@ api.interceptors.response.use(
   }
 );
 
-const API_BASE_URL = process.env.REACT_APP_API_URL || 'https://eenytdwn-api.onrender.com';
+const API_BASE_URL = '/.netlify/functions';
 
 export const getVideoInfo = async (url) => {
   try {
-    const response = await axios.get(`${API_BASE_URL}/api/info?url=${encodeURIComponent(url)}`);
+    const response = await axios.get(`${API_BASE_URL}/info?url=${encodeURIComponent(url)}`);
     return response.data;
   } catch (error) {
     throw new Error(error.response?.data?.message || 'حدث خطأ أثناء جلب معلومات الفيديو');
@@ -51,7 +51,7 @@ export const getVideoInfo = async (url) => {
 export const downloadVideo = async (url, itag, title = 'video') => {
   try {
     const response = await axios.get(
-      `${API_BASE_URL}/api/download?url=${encodeURIComponent(url)}&itag=${itag}`,
+      `${API_BASE_URL}/download?url=${encodeURIComponent(url)}&itag=${itag}`,
       { responseType: 'blob' }
     );
 
