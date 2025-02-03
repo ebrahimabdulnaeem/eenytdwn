@@ -1,11 +1,7 @@
 import axios from 'axios';
 
-const API_BASE_URL = process.env.NODE_ENV === 'production' 
-  ? '' // استخدام المسار النسبي في الإنتاج
-  : 'http://localhost:5000';
-
 const api = axios.create({
-  baseURL: API_BASE_URL,
+  baseURL: '',
   timeout: 30000,
   headers: {
     'Content-Type': 'application/json',
@@ -43,16 +39,19 @@ api.interceptors.response.use(
 export const getVideoInfo = async (url) => {
   try {
     console.log('Fetching video info for URL:', url);
-    const response = await api.get(`/.netlify/functions/info?url=${encodeURIComponent(url)}`);
+    const response = await api.get(`/.netlify/functions/info`, {
+      params: {
+        url: url
+      }
+    });
+    
     console.log('Video info response:', response.data);
     
-    // التحقق من البيانات المستلمة
     if (!response.data || typeof response.data !== 'object') {
       console.error('Invalid response data:', response.data);
       throw new Error('استجابة غير صالحة من الخادم');
     }
 
-    // التحقق من وجود الحقول المطلوبة
     const requiredFields = ['title', 'thumbnail', 'duration', 'author', 'views', 'likes', 'description', 'formats'];
     const missingFields = requiredFields.filter(field => !response.data[field]);
     
@@ -73,7 +72,11 @@ export const getVideoInfo = async (url) => {
 
 export const downloadVideo = async (url, itag, title) => {
   try {
-    const response = await api.get(`/.netlify/functions/download?url=${encodeURIComponent(url)}&itag=${itag}`, {
+    const response = await api.get(`/.netlify/functions/download`, {
+      params: {
+        url: url,
+        itag: itag
+      },
       responseType: 'blob'
     });
 
