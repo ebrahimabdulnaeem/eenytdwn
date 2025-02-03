@@ -4,7 +4,7 @@
   command = "npm run build"
 
 [functions]
-  directory = "server"
+  directory = "server/functions"
 
 # Handle API requests first
 [[redirects]]
