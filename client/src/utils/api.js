@@ -38,19 +38,29 @@ api.interceptors.response.use(
 );
 
 const API_BASE_URL = process.env.NODE_ENV === 'production' 
-  ? '/.netlify/functions/api'
+  ? '/.netlify/functions'
   : 'http://localhost:5000';
 
 export const getVideoInfo = async (url) => {
   try {
     const response = await fetch(`${API_BASE_URL}/info?url=${encodeURIComponent(url)}`);
+    
+    const contentType = response.headers.get('content-type');
+    if (!contentType || !contentType.includes('application/json')) {
+      throw new Error('استجابة غير صالحة من الخادم');
+    }
+
     if (!response.ok) {
       const error = await response.json();
-      throw new Error(error.error || 'Failed to fetch video info');
+      throw new Error(error.error || 'فشل في جلب معلومات الفيديو');
     }
+    
     return await response.json();
   } catch (error) {
     console.error('Error in getVideoInfo:', error);
+    if (error.message === 'Failed to fetch') {
+      throw new Error('لا يمكن الاتصال بالخادم. يرجى التحقق من اتصال الإنترنت والمحاولة مرة أخرى');
+    }
     throw error;
   }
 };
@@ -58,13 +68,18 @@ export const getVideoInfo = async (url) => {
 export const downloadVideo = async (url, itag, title) => {
   try {
     const response = await fetch(`${API_BASE_URL}/download?url=${encodeURIComponent(url)}&itag=${itag}`);
+    
     if (!response.ok) {
-      const error = await response.json();
-      throw new Error(error.error || 'Failed to download video');
+      const contentType = response.headers.get('content-type');
+      if (contentType && contentType.includes('application/json')) {
+        const error = await response.json();
+        throw new Error(error.error || 'فشل في تحميل الفيديو');
+      }
+      throw new Error('فشل في تحميل الفيديو');
     }
 
-    const contentType = response.headers?.['content-type'] || '';
-    const extension = contentType.includes('video/mp4') ? 'mp4' : 'webm';
+    const contentType = response.headers.get('content-type');
+    const extension = contentType?.includes('video/mp4') ? 'mp4' : 'webm';
     const blob = await response.blob();
     const downloadUrl = window.URL.createObjectURL(blob);
     const link = document.createElement('a');
@@ -76,6 +91,9 @@ export const downloadVideo = async (url, itag, title) => {
     setTimeout(() => window.URL.revokeObjectURL(downloadUrl), 100);
   } catch (error) {
     console.error('Error in downloadVideo:', error);
+    if (error.message === 'Failed to fetch') {
+      throw new Error('لا يمكن الاتصال بالخادم. يرجى التحقق من اتصال الإنترنت والمحاولة مرة أخرى');
+    }
     throw error;
   }
 }; 
