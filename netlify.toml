@@ -1,11 +1,14 @@
 [build]
-  base = "client"
-  publish = "build"
-  command = "cd ../server/functions && npm install && cd ../../client && npm run build"
+  command = "cd client && npm run build"
+  publish = "client/build"
 
 [functions]
   directory = "server/functions"
   node_bundler = "esbuild"
+  included_files = ["server/functions/package.json"]
+
+[build.environment]
+  NODE_VERSION = "18"
 
 [[redirects]]
   from = "/api/*"
