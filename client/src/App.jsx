@@ -1,6 +1,6 @@
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-import { Box, Container, Typography, Alert } from '@mui/material';
+import { Box, Container, Typography } from '@mui/material';
 import { styled } from '@mui/material/styles';
 import Header from './components/Header';
 import Footer from './components/Footer';
@@ -108,24 +108,6 @@ const Subtitle = styled(Typography)({
     margin: '0 auto 2rem',
   },
 });
-
-const StyledAlert = styled(Alert)(({ theme }) => ({
-  borderRadius: '15px',
-  backdropFilter: 'blur(10px)',
-  border: '1px solid rgba(103, 58, 183, 0.2)',
-  boxShadow: '0 8px 32px 0 rgba(0, 0, 0, 0.37)',
-  animation: 'slideIn 0.3s ease-out',
-  '@keyframes slideIn': {
-    from: {
-      transform: 'translateY(-20px)',
-      opacity: 0,
-    },
-    to: {
-      transform: 'translateY(0)',
-      opacity: 1,
-    },
-  },
-}));
 
 const LoadingContainer = styled(Box)({
   display: 'flex',
