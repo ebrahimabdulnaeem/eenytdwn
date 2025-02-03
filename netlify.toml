@@ -1,11 +1,10 @@
 [build]
   base = "client"
   publish = "build"
-  command = "cd ../functions && npm ci --production && cd ../client && npm ci --production && npm run build"
-  functions = "../functions"
+  command = "npm run build"
 
-[[plugins]]
-  package = "@netlify/plugin-functions-install-core"
+[functions]
+  directory = "server"
 
 [[redirects]]
   from = "/api/*"
@@ -15,8 +14,4 @@
 [[redirects]]
   from = "/*"
   to = "/index.html"
-  status = 200
-
-[build.environment]
-  CI = "false"
-  NODE_OPTIONS = "--max_old_space_size=4096" 
+  status = 200 

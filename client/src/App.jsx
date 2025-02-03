@@ -35,13 +35,11 @@ const MainContent = styled(Box)({
 });
 
 const HeroSection = styled(Box)({
-  minHeight: '50vh',
-  display: 'flex',
-  alignItems: 'center',
-  justifyContent: 'center',
-  padding: '2rem 0',
-  background: 'linear-gradient(135deg, #1a1a2e 0%, #16213e 100%)',
+  background: 'linear-gradient(135deg, rgba(26, 26, 46, 0.97) 0%, rgba(22, 33, 62, 0.97) 100%)',
+  padding: '10rem 0 6rem 0',
+  textAlign: 'center',
   position: 'relative',
+  overflow: 'hidden',
   '&::before': {
     content: '""',
     position: 'absolute',
@@ -49,17 +47,36 @@ const HeroSection = styled(Box)({
     left: 0,
     right: 0,
     bottom: 0,
-    background: 'radial-gradient(circle at center, rgba(103, 58, 183, 0.1) 0%, transparent 70%)',
-  }
+    background: 'url("data:image/svg+xml,%3Csvg width=\'100\' height=\'100\' viewBox=\'0 0 100 100\' xmlns=\'http://www.w3.org/2000/svg\'%3E%3Cpath d=\'M11 18c3.866 0 7-3.134 7-7s-3.134-7-7-7-7 3.134-7 7 3.134 7 7 7zm48 25c3.866 0 7-3.134 7-7s-3.134-7-7-7-7 3.134-7 7 3.134 7 7 7zm-43-7c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zm63 31c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zM34 90c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zm56-76c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zM12 86c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm28-65c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm23-11c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm-6 60c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm29 22c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zM32 63c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm57-13c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm-9-21c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM60 91c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM35 41c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM12 60c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2z\' fill=\'%23ffffff\' fill-opacity=\'0.03\' fill-rule=\'evenodd\'/%3E%3C/svg%3E")',
+    backgroundSize: '30px 30px',
+    opacity: 0.5,
+    animation: 'gradient 15s ease infinite',
+    pointerEvents: 'none',
+  },
+  '@keyframes gradient': {
+    '0%': {
+      backgroundPosition: '0% 0%',
+    },
+    '50%': {
+      backgroundPosition: '100% 100%',
+    },
+    '100%': {
+      backgroundPosition: '0% 0%',
+    },
+  },
 });
 
 const ContentSection = styled(Container)({
-  padding: '2rem 0',
+  flex: 1,
+  padding: '3rem 0',
   position: 'relative',
-  zIndex: 1
+  zIndex: 1,
+  '@media (max-width: 600px)': {
+    padding: '2rem 1rem',
+  },
 });
 
-const GlowingTitle = styled('h1')({
+const GlowingTitle = styled(Typography)({
   fontSize: '4rem',
   fontWeight: '900',
   marginBottom: '1.5rem',
@@ -82,7 +99,7 @@ const GlowingTitle = styled('h1')({
   },
 });
 
-const Subtitle = styled('h2')({
+const Subtitle = styled(Typography)({
   color: 'rgba(255, 255, 255, 0.9)',
   fontSize: '1.4rem',
   maxWidth: '800px',

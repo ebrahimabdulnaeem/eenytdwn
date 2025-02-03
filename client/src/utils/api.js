@@ -37,60 +37,45 @@ api.interceptors.response.use(
   }
 );
 
-const API_BASE_URL = '/.netlify/functions';
+const API_BASE_URL = process.env.NODE_ENV === 'production' 
+  ? '/.netlify/functions/api'
+  : 'http://localhost:5000';
 
 export const getVideoInfo = async (url) => {
   try {
-    const response = await axios.get(`${API_BASE_URL}/info?url=${encodeURIComponent(url)}`);
-    return response.data;
+    const response = await fetch(`${API_BASE_URL}/info?url=${encodeURIComponent(url)}`);
+    if (!response.ok) {
+      const error = await response.json();
+      throw new Error(error.error || 'Failed to fetch video info');
+    }
+    return await response.json();
   } catch (error) {
-    throw new Error(error.response?.data?.message || 'حدث خطأ أثناء جلب معلومات الفيديو');
+    console.error('Error in getVideoInfo:', error);
+    throw error;
   }
 };
 
-export const downloadVideo = async (url, itag, title = 'video') => {
+export const downloadVideo = async (url, itag, title) => {
   try {
-    const response = await axios.get(
-      `${API_BASE_URL}/download?url=${encodeURIComponent(url)}&itag=${itag}`,
-      { responseType: 'blob' }
-    );
-
-    // تنظيف عنوان الفيديو من الأحرف غير المسموح بها في اسم الملف
-    const cleanTitle = (title || 'video').replace(/[/\\?%*:|"<>]/g, '-');
-    
-    // تحديد امتداد الملف بناءً على نوع المحتوى
-    const contentType = response.headers?.['content-type'] || '';
-    let extension = 'mp4'; // الامتداد الافتراضي
-
-    // التحقق من نوع المحتوى بشكل آمن
-    if (contentType) {
-      if (contentType.toLowerCase().includes('audio')) {
-        extension = 'mp3';
-      } else if (contentType.toLowerCase().includes('video')) {
-        extension = 'mp4';
-      }
+    const response = await fetch(`${API_BASE_URL}/download?url=${encodeURIComponent(url)}&itag=${itag}`);
+    if (!response.ok) {
+      const error = await response.json();
+      throw new Error(error.error || 'Failed to download video');
     }
 
-    // إنشاء كائن Blob مع نوع المحتوى المناسب
-    const blob = new Blob([response.data], { type: contentType || 'video/mp4' });
-    
-    // إنشاء رابط تحميل مؤقت
+    const contentType = response.headers?.['content-type'] || '';
+    const extension = contentType.includes('video/mp4') ? 'mp4' : 'webm';
+    const blob = await response.blob();
     const downloadUrl = window.URL.createObjectURL(blob);
     const link = document.createElement('a');
     link.href = downloadUrl;
-    link.setAttribute('download', `${cleanTitle}.${extension}`);
-    
-    // إضافة الرابط وتنفيذ التحميل
+    link.download = `${title || 'video'}.${extension}`;
     document.body.appendChild(link);
     link.click();
-    
-    // تنظيف الموارد
-    setTimeout(() => {
-      document.body.removeChild(link);
-      window.URL.revokeObjectURL(downloadUrl);
-    }, 100);
+    document.body.removeChild(link);
+    setTimeout(() => window.URL.revokeObjectURL(downloadUrl), 100);
   } catch (error) {
     console.error('Error in downloadVideo:', error);
-    throw new Error('فشل في تحميل الفيديو. يرجى المحاولة مرة أخرى.');
+    throw error;
   }
 }; 
