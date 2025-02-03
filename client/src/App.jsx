@@ -1,6 +1,6 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-import { Container, Typography, Box, Alert, CircularProgress, Snackbar } from '@mui/material';
+import { Box, Container, Typography } from '@mui/material';
 import { styled } from '@mui/material/styles';
 import Header from './components/Header';
 import Footer from './components/Footer';
@@ -10,9 +10,6 @@ import Features from './pages/Features';
 import HowToUse from './pages/HowToUse';
 import Privacy from './pages/Privacy';
 import Contact from './pages/Contact';
-import UrlInput from './components/UrlInput';
-import VideoInfo from './components/VideoInfo';
-import DownloadOptions from './components/DownloadOptions';
 import { getVideoInfo, downloadVideo } from './utils/api';
 
 const MainContent = styled(Box)({
@@ -155,50 +152,6 @@ const LoadingContainer = styled(Box)({
 });
 
 function App() {
-  const [videoInfo, setVideoInfo] = useState(null);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState('');
-  const [currentUrl, setCurrentUrl] = useState('');
-  const [showSuccessMessage, setShowSuccessMessage] = useState(false);
-
-  const handleUrlSubmit = async (url) => {
-    setLoading(true);
-    setError('');
-    setVideoInfo(null);
-    setCurrentUrl(url);
-    setShowSuccessMessage(false);
-
-    try {
-      if (!url.trim()) {
-        throw new Error('يرجى إدخال رابط فيديو يوتيوب');
-      }
-
-      try {
-        new URL(url);
-      } catch {
-        throw new Error('يرجى إدخال رابط صحيح');
-      }
-
-      const info = await getVideoInfo(url);
-      setVideoInfo(info);
-      setShowSuccessMessage(true);
-    } catch (err) {
-      console.error('Error fetching video:', err);
-      setError(err.message || 'فشل في جلب معلومات الفيديو. يرجى التحقق من الرابط والمحاولة مرة أخرى.');
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const handleDownload = async (itag, title) => {
-    try {
-      await downloadVideo(currentUrl, itag, title);
-    } catch (err) {
-      console.error('Download error:', err);
-      setError(err.message || 'فشل بدء التحميل. يرجى المحاولة مرة أخرى.');
-    }
-  };
-
   return (
     <Router>
       <MainContent>

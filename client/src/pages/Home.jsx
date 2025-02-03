@@ -2,7 +2,6 @@ import React from 'react';
 import { Container, Typography, Box, Button, Grid, Paper } from '@mui/material';
 import { styled } from '@mui/material/styles';
 import { useNavigate } from 'react-router-dom';
-import YouTubeIcon from '@mui/icons-material/YouTube';
 import SpeedIcon from '@mui/icons-material/Speed';
 import SecurityIcon from '@mui/icons-material/Security';
 import HighQualityIcon from '@mui/icons-material/HighQuality';
