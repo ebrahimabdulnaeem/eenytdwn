@@ -42,7 +42,25 @@ api.interceptors.response.use(
 
 export const getVideoInfo = async (url) => {
   try {
+    console.log('Fetching video info for URL:', url);
     const response = await api.get(`/.netlify/functions/info?url=${encodeURIComponent(url)}`);
+    console.log('Video info response:', response.data);
+    
+    // التحقق من البيانات المستلمة
+    if (!response.data || typeof response.data !== 'object') {
+      console.error('Invalid response data:', response.data);
+      throw new Error('استجابة غير صالحة من الخادم');
+    }
+
+    // التحقق من وجود الحقول المطلوبة
+    const requiredFields = ['title', 'thumbnail', 'duration', 'author', 'views', 'likes', 'description', 'formats'];
+    const missingFields = requiredFields.filter(field => !response.data[field]);
+    
+    if (missingFields.length > 0) {
+      console.error('Missing required fields:', missingFields);
+      throw new Error('بيانات الفيديو غير مكتملة');
+    }
+
     return response.data;
   } catch (error) {
     console.error('Error in getVideoInfo:', error);
