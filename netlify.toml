@@ -1,11 +1,12 @@
 [build]
-  command = "cd client && npm run build"
-  publish = "client/build"
+  command = "npm run build"
+  publish = "build"
+  base = "client"
 
 [functions]
-  directory = "server/functions"
+  directory = "../server/functions"
   node_bundler = "esbuild"
-  included_files = ["server/functions/package.json"]
+  included_files = ["../server/functions/package.json"]
 
 [build.environment]
   NODE_VERSION = "18"
