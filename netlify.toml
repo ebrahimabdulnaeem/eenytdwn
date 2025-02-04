@@ -1,18 +1,24 @@
 [build]
-  command = "npm run build"
-  publish = "build"
-  base = "client"
+  command = "cd client && npm install && npm run build"
+  publish = "client/build"
 
 [functions]
-  directory = "../server/functions"
+  directory = "server/functions"
   node_bundler = "esbuild"
-  external_node_modules = ["ytdl-core", "serverless-http"]
+  external_node_modules = ["yt-dlp-wrap"]
 
-[[plugins]]
-  package = "@netlify/plugin-functions-install-core"
+[functions.info]
+  included_files = ["node_modules/yt-dlp-wrap/bin/*"]
+
+[functions.download]
+  included_files = ["node_modules/yt-dlp-wrap/bin/*"]
 
 [build.environment]
   NODE_VERSION = "18"
+  YT_DLP_NO_UPDATE = "1"
+
+[[plugins]]
+  package = "@netlify/plugin-functions-install-core"
 
 [[redirects]]
   from = "/api/*"
