@@ -1,17 +1,12 @@
 [build]
   base = "client"
-  command = "npm install && npm run build && cd ../server/functions && npm install"
+  command = "npm install && npm run build && cd ../server/functions && rm -f api.js && npm install"
   publish = "build"
 
 [functions]
   directory = "../server/functions"
   node_bundler = "esbuild"
   external_node_modules = ["yt-dlp-wrap"]
-
-[functions.info]
-  included_files = ["../server/functions/node_modules/yt-dlp-wrap/bin/*"]
-
-[functions.download]
   included_files = ["../server/functions/node_modules/yt-dlp-wrap/bin/*"]
 
 [build.environment]
