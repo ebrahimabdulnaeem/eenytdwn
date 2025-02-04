@@ -18,6 +18,7 @@ exports.handler = async (event) => {
     const { url } = event.queryStringParameters;
     
     if (!url) {
+      console.error('Error: URL parameter is missing');
       return {
         statusCode: 400,
         body: JSON.stringify({ error: 'URL parameter is required' })
