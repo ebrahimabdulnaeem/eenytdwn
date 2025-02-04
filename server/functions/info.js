@@ -1,4 +1,4 @@
-const ytdl = require('ytdl-core');
+const youtubedl = require('youtube-dl-exec');
 
 exports.handler = async (event) => {
   try {
@@ -27,37 +27,35 @@ exports.handler = async (event) => {
 
     console.log('Fetching info for URL:', url);
     
-    // Add options to handle age-restricted videos and use latest API version
-    const info = await ytdl.getInfo(url, {
-      requestOptions: {
-        headers: {
-          'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
-          'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8',
-          'Accept-Language': 'en-US,en;q=0.9'
-        }
-      }
+    // Get video info using youtube-dl-exec
+    const info = await youtubedl(url, {
+      dumpSingleJson: true,
+      noWarnings: true,
+      noCallHome: true,
+      preferFreeFormats: true,
+      youtubeSkipDashManifest: true
     });
 
-    if (!info || !info.videoDetails) {
+    if (!info) {
       console.error('Error: Invalid video info response');
       throw new Error('Could not fetch video information');
     }
     
     const videoInfo = {
-      title: info.videoDetails.title,
-      thumbnail: info.videoDetails.thumbnails[info.videoDetails.thumbnails.length - 1].url,
-      duration: info.videoDetails.lengthSeconds,
-      author: info.videoDetails.author.name,
-      views: info.videoDetails.viewCount,
-      likes: info.videoDetails.likes || 0,
-      description: info.videoDetails.description,
+      title: info.title,
+      thumbnail: info.thumbnail,
+      duration: info.duration,
+      author: info.uploader,
+      views: info.view_count,
+      likes: info.like_count || 0,
+      description: info.description,
       formats: info.formats
-        .filter(format => format.hasVideo && format.hasAudio)
+        .filter(format => format.vcodec !== 'none' && format.acodec !== 'none')
         .map(format => ({
-          itag: format.itag,
-          quality: format.qualityLabel,
-          container: format.container,
-          size: format.contentLength
+          itag: format.format_id,
+          quality: format.height ? `${format.height}p` : 'Audio only',
+          container: format.ext,
+          size: format.filesize
         }))
     };
 
@@ -81,13 +79,13 @@ exports.handler = async (event) => {
     let statusCode = 500;
     let errorMessage = error.message || 'An error occurred while fetching video information';
     
-    if (error.message.includes('Status code: 410')) {
+    if (error.message.includes('Video unavailable')) {
       statusCode = 410;
       errorMessage = 'This video is no longer available';
-    } else if (error.message.includes('private video')) {
+    } else if (error.message.includes('Private video')) {
       statusCode = 403;
       errorMessage = 'This video is private';
-    } else if (error.message.includes('sign in')) {
+    } else if (error.message.includes('Sign in')) {
       statusCode = 403;
       errorMessage = 'This video requires authentication';
     }

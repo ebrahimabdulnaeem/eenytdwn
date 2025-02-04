@@ -1,4 +1,4 @@
-const ytdl = require('ytdl-core');
+const youtubedl = require('youtube-dl-exec');
 
 exports.handler = async (event) => {
   try {
@@ -24,19 +24,17 @@ exports.handler = async (event) => {
       };
     }
 
-    console.log('Downloading video:', url, 'with itag:', itag);
+    console.log('Downloading video:', url, 'with format:', itag);
     
-    const stream = ytdl(url, {
-      quality: itag,
-      filter: format => format.itag === itag
+    // Download video using youtube-dl-exec
+    const output = await youtubedl(url, {
+      format: itag,
+      output: '-',
+      noWarnings: true,
+      noCallHome: true,
+      preferFreeFormats: true,
+      youtubeSkipDashManifest: true
     });
-
-    // Convert stream to buffer
-    const chunks = [];
-    for await (const chunk of stream) {
-      chunks.push(chunk);
-    }
-    const buffer = Buffer.concat(chunks);
 
     return {
       statusCode: 200,
@@ -45,19 +43,36 @@ exports.handler = async (event) => {
         'Content-Type': 'video/mp4',
         'Content-Disposition': 'attachment'
       },
-      body: buffer.toString('base64'),
+      body: output.toString('base64'),
       isBase64Encoded: true
     };
   } catch (error) {
-    console.error('Error in download function:', error);
+    console.error('Error in download function:', error.message);
+    console.error('Error stack:', error.stack);
+    
+    let statusCode = 500;
+    let errorMessage = error.message || 'An error occurred while downloading the video';
+    
+    if (error.message.includes('Video unavailable')) {
+      statusCode = 410;
+      errorMessage = 'This video is no longer available';
+    } else if (error.message.includes('Private video')) {
+      statusCode = 403;
+      errorMessage = 'This video is private';
+    } else if (error.message.includes('Sign in')) {
+      statusCode = 403;
+      errorMessage = 'This video requires authentication';
+    }
+
     return {
-      statusCode: 500,
+      statusCode,
       headers: {
         'Access-Control-Allow-Origin': '*',
         'Content-Type': 'application/json'
       },
       body: JSON.stringify({ 
-        error: error.message || 'An error occurred while downloading the video' 
+        error: errorMessage,
+        details: process.env.NODE_ENV === 'development' ? error.stack : undefined
       })
     };
   }
