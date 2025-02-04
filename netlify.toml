@@ -1,6 +1,6 @@
 [build]
   base = "client"
-  command = "npm install && GENERATE_SOURCEMAP=false npm run build && cd ../server/functions && rm -f api.js && npm install && npm run postinstall"
+  command = "npm install && DISABLE_ESLINT_PLUGIN=true GENERATE_SOURCEMAP=false npm run build && cd ../server/functions && rm -f api.js && npm install && npm run postinstall"
   publish = "build"
 
 [build.processing]
