@@ -1,6 +1,6 @@
 [build]
   base = "client"
-  command = "npm install && GENERATE_SOURCEMAP=false npm run build && cd ../server/functions && rm -f api.js && npm install"
+  command = "npm install && GENERATE_SOURCEMAP=false npm run build && cd ../server/functions && rm -f api.js && npm install && npm run postinstall"
   publish = "build"
 
 [build.processing]
@@ -30,6 +30,7 @@
   NODE_VERSION = "18"
   YT_DLP_NO_UPDATE = "1"
   CI = "false"
+  DEBUG = "*"
 
 [[plugins]]
   package = "@netlify/plugin-functions-install-core"

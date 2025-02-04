@@ -16,20 +16,34 @@ exports.handler = async (event) => {
       };
     }
 
+    console.log('Event received:', JSON.stringify(event));
+    
     const { url } = event.queryStringParameters;
     
     if (!url) {
       console.error('Error: URL parameter is missing');
       return {
         statusCode: 400,
+        headers: {
+          'Access-Control-Allow-Origin': '*',
+          'Content-Type': 'application/json'
+        },
         body: JSON.stringify({ error: 'URL parameter is required' })
       };
     }
 
     console.log('Fetching info for URL:', url);
+    console.log('YT-DLP Version:', await ytDlp.getVersion());
     
-    // Get video info using yt-dlp-wrap
-    const info = await ytDlp.getVideoInfo(url);
+    // Get video info using yt-dlp-wrap with additional options
+    const info = await ytDlp.getVideoInfo(url, {
+      dumpSingleJson: true,
+      noCheckCertificates: true,
+      noWarnings: true,
+      preferFreeFormats: true
+    });
+
+    console.log('Raw video info received:', JSON.stringify(info));
 
     if (!info) {
       console.error('Error: Invalid video info response');
@@ -54,6 +68,8 @@ exports.handler = async (event) => {
         }))
     };
 
+    console.log('Processed video info:', JSON.stringify(videoInfo));
+
     if (videoInfo.formats.length === 0) {
       console.error('Error: No valid formats found');
       throw new Error('No valid video formats available');
@@ -70,6 +86,7 @@ exports.handler = async (event) => {
   } catch (error) {
     console.error('Error in info function:', error.message);
     console.error('Error stack:', error.stack);
+    console.error('Full error object:', JSON.stringify(error));
     
     let statusCode = 500;
     let errorMessage = error.message || 'An error occurred while fetching video information';
@@ -93,7 +110,8 @@ exports.handler = async (event) => {
       },
       body: JSON.stringify({ 
         error: errorMessage,
-        details: process.env.NODE_ENV === 'development' ? error.stack : undefined
+        details: process.env.NODE_ENV === 'development' ? error.stack : undefined,
+        timestamp: new Date().toISOString()
       })
     };
   }
