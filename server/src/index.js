@@ -20,7 +20,9 @@ const youtube = google.youtube({
 
 // Middleware
 app.use(cors({
-  origin: 'http://localhost:3000',
+  origin: process.env.NODE_ENV === 'production' 
+    ? ['https://your-frontend-url.vercel.app', 'https://your-app.github.io']
+    : '*',
   methods: ['GET', 'POST'],
   credentials: true
 }));

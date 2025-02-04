@@ -1,8 +1,9 @@
 import axios from 'axios';
 
+// Create axios instance with default config
 const api = axios.create({
-  baseURL: '',
-  timeout: 30000,
+  baseURL: 'http://localhost:5000/api',
+  timeout: 30000, // 30 seconds timeout
   headers: {
     'Content-Type': 'application/json',
     'Accept': 'application/json'
@@ -30,7 +31,7 @@ api.interceptors.response.use(
   error => {
     console.error('API Response Error:', error);
     if (error.code === 'ERR_NETWORK') {
-      throw new Error('لا يمكن الاتصال بالخادم. يرجى التأكد من اتصال الإنترنت والمحاولة مرة أخرى');
+      throw new Error('لا يمكن الاتصال بالخادم. يرجى التأكد من تشغيل الخادم والمحاولة مرة أخرى');
     }
     throw error.response?.data?.error || error.message || 'حدث خطأ غير معروف';
   }
@@ -38,64 +39,59 @@ api.interceptors.response.use(
 
 export const getVideoInfo = async (url) => {
   try {
-    console.log('Fetching video info for URL:', url);
-    const response = await api.get(`/api/info`, {
-      params: {
-        url: url
-      }
+    const response = await api.get('/video-info', {
+      params: { url }
     });
-    
-    console.log('Video info response:', response.data);
-    
-    if (!response.data || typeof response.data !== 'object') {
-      console.error('Invalid response data:', response.data);
-      throw new Error('استجابة غير صالحة من الخادم');
-    }
-
-    const requiredFields = ['title', 'thumbnail', 'duration', 'author', 'views', 'likes', 'description', 'formats'];
-    const missingFields = requiredFields.filter(field => !response.data[field]);
-    
-    if (missingFields.length > 0) {
-      console.error('Missing required fields:', missingFields);
-      throw new Error('بيانات الفيديو غير مكتملة');
-    }
-
     return response.data;
   } catch (error) {
     console.error('Error in getVideoInfo:', error);
-    if (error.message === 'Network Error') {
-      throw new Error('لا يمكن الاتصال بالخادم. يرجى التحقق من اتصال الإنترنت والمحاولة مرة أخرى');
-    }
-    throw new Error(error.response?.data?.error || error.message || 'فشل في جلب معلومات الفيديو');
+    throw error;
   }
 };
 
-export const downloadVideo = async (url, itag, title) => {
+export const downloadVideo = async (url, itag, title = 'video') => {
   try {
-    const response = await api.get(`/api/download`, {
-      params: {
-        url: url,
-        itag: itag
-      },
+    const response = await api.get('/download', {
+      params: { url, itag },
       responseType: 'blob'
     });
 
-    const contentType = response.headers['content-type'];
-    const extension = contentType?.includes('video/mp4') ? 'mp4' : 'webm';
-    const blob = new Blob([response.data], { type: contentType });
+    // تنظيف عنوان الفيديو من الأحرف غير المسموح بها في اسم الملف
+    const cleanTitle = (title || 'video').replace(/[/\\?%*:|"<>]/g, '-');
+    
+    // تحديد امتداد الملف بناءً على نوع المحتوى
+    const contentType = response.headers?.['content-type'] || '';
+    let extension = 'mp4'; // الامتداد الافتراضي
+
+    // التحقق من نوع المحتوى بشكل آمن
+    if (contentType) {
+      if (contentType.toLowerCase().includes('audio')) {
+        extension = 'mp3';
+      } else if (contentType.toLowerCase().includes('video')) {
+        extension = 'mp4';
+      }
+    }
+
+    // إنشاء كائن Blob مع نوع المحتوى المناسب
+    const blob = new Blob([response.data], { type: contentType || 'video/mp4' });
+    
+    // إنشاء رابط تحميل مؤقت
     const downloadUrl = window.URL.createObjectURL(blob);
     const link = document.createElement('a');
     link.href = downloadUrl;
-    link.download = `${title || 'video'}.${extension}`;
+    link.setAttribute('download', `${cleanTitle}.${extension}`);
+    
+    // إضافة الرابط وتنفيذ التحميل
     document.body.appendChild(link);
     link.click();
-    document.body.removeChild(link);
-    setTimeout(() => window.URL.revokeObjectURL(downloadUrl), 100);
+    
+    // تنظيف الموارد
+    setTimeout(() => {
+      document.body.removeChild(link);
+      window.URL.revokeObjectURL(downloadUrl);
+    }, 100);
   } catch (error) {
     console.error('Error in downloadVideo:', error);
-    if (error.message === 'Network Error') {
-      throw new Error('لا يمكن الاتصال بالخادم. يرجى التحقق من اتصال الإنترنت والمحاولة مرة أخرى');
-    }
-    throw new Error(error.response?.data?.error || error.message || 'فشل في تحميل الفيديو');
+    throw new Error('فشل في تحميل الفيديو. يرجى المحاولة مرة أخرى.');
   }
 }; 
