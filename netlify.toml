@@ -1,17 +1,18 @@
 [build]
-  command = "cd client && npm install && npm run build"
-  publish = "client/build"
+  base = "client"
+  command = "npm install && npm run build"
+  publish = "build"
 
 [functions]
-  directory = "server/functions"
+  directory = "../server/functions"
   node_bundler = "esbuild"
   external_node_modules = ["yt-dlp-wrap"]
 
 [functions.info]
-  included_files = ["node_modules/yt-dlp-wrap/bin/*"]
+  included_files = ["../server/functions/node_modules/yt-dlp-wrap/bin/*"]
 
 [functions.download]
-  included_files = ["node_modules/yt-dlp-wrap/bin/*"]
+  included_files = ["../server/functions/node_modules/yt-dlp-wrap/bin/*"]
 
 [build.environment]
   NODE_VERSION = "18"
@@ -23,12 +24,6 @@
 [[redirects]]
   from = "/api/*"
   to = "/.netlify/functions/:splat"
-  status = 200
-  force = true
-
-[[redirects]]
-  from = "/static/*"
-  to = "/static/:splat"
   status = 200
   force = true
 
