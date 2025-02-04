@@ -39,9 +39,7 @@ api.interceptors.response.use(
 
 export const getVideoInfo = async (url) => {
   try {
-    const response = await api.get('/video-info', {
-      params: { url }
-    });
+    const response = await api.post('/video-info', { url });
     return response.data;
   } catch (error) {
     console.error('Error in getVideoInfo:', error);
@@ -51,8 +49,7 @@ export const getVideoInfo = async (url) => {
 
 export const downloadVideo = async (url, itag, title = 'video') => {
   try {
-    const response = await api.get('/download', {
-      params: { url, itag },
+    const response = await api.post('/get-formats', { url, itag }, {
       responseType: 'blob'
     });
 
