@@ -2,12 +2,13 @@ import axios from 'axios';
 
 // Create axios instance with default config
 const api = axios.create({
-  baseURL: 'https://aged-tall-bladder.glitch.me',
+  baseURL: process.env.REACT_APP_API_URL || 'https://crocus-rogue-frost.glitch.me',
   timeout: 30000, // 30 seconds timeout
   headers: {
     'Content-Type': 'application/json',
     'Accept': 'application/json'
-  }
+  },
+  withCredentials: true // إضافة هذا الخيار للسماح بإرسال ملفات تعريف الارتباط
 });
 
 // Add request interceptor for logging
@@ -39,7 +40,7 @@ api.interceptors.response.use(
 
 export const getVideoInfo = async (url) => {
   try {
-    const response = await api.post('/video-info', { url });
+    const response = await api.get('/api/video-info', { params: { url } });
     return response.data;
   } catch (error) {
     console.error('Error in getVideoInfo:', error);
@@ -49,7 +50,8 @@ export const getVideoInfo = async (url) => {
 
 export const downloadVideo = async (url, itag, title = 'video') => {
   try {
-    const response = await api.post('/get-formats', { url, itag }, {
+    const response = await api.get('/api/download', {
+      params: { url, itag },
       responseType: 'blob'
     });
 
