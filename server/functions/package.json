@@ -4,7 +4,8 @@
   "description": "Netlify Functions for YouTube video downloader",
   "main": "index.js",
   "dependencies": {
-    "ytdl-core": "^4.11.5"
+    "ytdl-core": "^4.11.5",
+    "serverless-http": "^3.2.0"
   },
   "engines": {
     "node": ">=18.0.0"

@@ -6,7 +6,10 @@
 [functions]
   directory = "../server/functions"
   node_bundler = "esbuild"
-  included_files = ["../server/functions/package.json"]
+  external_node_modules = ["ytdl-core", "serverless-http"]
+
+[[plugins]]
+  package = "@netlify/plugin-functions-install-core"
 
 [build.environment]
   NODE_VERSION = "18"
