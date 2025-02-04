@@ -1,6 +1,6 @@
 [build]
   base = "client"
-  command = "npm install && npm run build"
+  command = "npm install && npm run build && cd ../server/functions && npm install"
   publish = "build"
 
 [functions]
