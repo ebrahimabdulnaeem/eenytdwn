@@ -1,7 +1,24 @@
 [build]
   base = "client"
-  command = "npm install && npm run build && cd ../server/functions && rm -f api.js && npm install"
+  command = "npm install && GENERATE_SOURCEMAP=false npm run build && cd ../server/functions && rm -f api.js && npm install"
   publish = "build"
+
+[build.processing]
+  skip_processing = false
+
+[build.processing.css]
+  bundle = true
+  minify = true
+
+[build.processing.js]
+  bundle = true
+  minify = true
+
+[build.processing.html]
+  pretty_urls = true
+
+[build.processing.images]
+  compress = true
 
 [functions]
   directory = "../server/functions"
@@ -12,16 +29,31 @@
 [build.environment]
   NODE_VERSION = "18"
   YT_DLP_NO_UPDATE = "1"
+  CI = "false"
 
 [[plugins]]
   package = "@netlify/plugin-functions-install-core"
 
+# Handle static files first
+[[redirects]]
+  from = "/static/*"
+  to = "/static/:splat"
+  status = 200
+
+# Handle JavaScript files
+[[redirects]]
+  from = "/*.js"
+  to = "/:splat.js"
+  status = 200
+
+# Handle API requests
 [[redirects]]
   from = "/api/*"
   to = "/.netlify/functions/:splat"
   status = 200
   force = true
 
+# Handle all other routes for SPA
 [[redirects]]
   from = "/*"
   to = "/index.html"
