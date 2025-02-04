@@ -1,4 +1,5 @@
-const youtubedl = require('youtube-dl-exec');
+const { YTDlpWrap } = require('yt-dlp-wrap');
+const ytDlp = new YTDlpWrap();
 
 exports.handler = async (event) => {
   try {
@@ -27,14 +28,8 @@ exports.handler = async (event) => {
 
     console.log('Fetching info for URL:', url);
     
-    // Get video info using youtube-dl-exec
-    const info = await youtubedl(url, {
-      dumpSingleJson: true,
-      noWarnings: true,
-      noCallHome: true,
-      preferFreeFormats: true,
-      youtubeSkipDashManifest: true
-    });
+    // Get video info using yt-dlp-wrap
+    const info = await ytDlp.getVideoInfo(url);
 
     if (!info) {
       console.error('Error: Invalid video info response');

@@ -1,4 +1,5 @@
-const youtubedl = require('youtube-dl-exec');
+const { YTDlpWrap } = require('yt-dlp-wrap');
+const ytDlp = new YTDlpWrap();
 
 exports.handler = async (event) => {
   try {
@@ -26,15 +27,14 @@ exports.handler = async (event) => {
 
     console.log('Downloading video:', url, 'with format:', itag);
     
-    // Download video using youtube-dl-exec
-    const output = await youtubedl(url, {
-      format: itag,
-      output: '-',
-      noWarnings: true,
-      noCallHome: true,
-      preferFreeFormats: true,
-      youtubeSkipDashManifest: true
-    });
+    // Download video using yt-dlp-wrap
+    const output = await ytDlp.execPromise([
+      url,
+      '-f', itag,
+      '-o', '-',
+      '--no-warnings',
+      '--no-call-home'
+    ]);
 
     return {
       statusCode: 200,
