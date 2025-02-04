@@ -2,25 +2,20 @@
   "version": 2,
   "builds": [
     {
-      "src": "package.json",
-      "use": "@vercel/node",
-      "config": {
-        "maxLambdaSize": "50mb"
-      }
+      "src": "build/**",
+      "use": "@vercel/static"
     }
   ],
   "routes": [
+    { "handle": "filesystem" },
     {
-      "src": "/(.*)",
-      "dest": "/"
+      "src": "/[^.]+",
+      "dest": "/index.html"
     }
   ],
   "env": {
     "REACT_APP_API_URL": "https://crocus-rogue-frost.glitch.me"
   },
-  "build": {
-    "env": {
-      "REACT_APP_API_URL": "https://crocus-rogue-frost.glitch.me"
-    }
-  }
+  "buildCommand": "npm run build",
+  "outputDirectory": "build"
 } 
