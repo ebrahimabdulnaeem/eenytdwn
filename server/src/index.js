@@ -20,9 +20,7 @@ const youtube = google.youtube({
 
 // Middleware
 app.use(cors({
-  origin: process.env.NODE_ENV === 'production' 
-    ? ['https://your-frontend-url.vercel.app', 'https://your-app.github.io']
-    : '*',
+  origin: '*',
   methods: ['GET', 'POST'],
   credentials: true
 }));
@@ -240,6 +238,33 @@ app.get('/api/download', async (req, res) => {
 // Health check endpoint
 app.get('/health', (req, res) => {
   res.json({ status: 'ok', timestamp: new Date().toISOString() });
+});
+
+// Video info endpoint
+app.post('/video-info', async (req, res) => {
+  try {
+    const { url } = req.body;
+    
+    if (!url) {
+      return res.status(400).json({ error: 'يرجى تقديم رابط الفيديو' });
+    }
+
+    if (!isValidYouTubeUrl(url)) {
+      return res.status(400).json({ error: 'الرجاء إدخال رابط يوتيوب صالح' });
+    }
+
+    const videoId = getVideoId(url);
+    const videoDetails = await getVideoDetails(videoId);
+    const formats = await getFormats(url);
+
+    res.json({
+      details: videoDetails,
+      formats: formats
+    });
+  } catch (error) {
+    console.error('Error in /video-info:', error);
+    res.status(500).json({ error: 'حدث خطأ أثناء جلب معلومات الفيديو' });
+  }
 });
 
 app.listen(PORT, () => {
