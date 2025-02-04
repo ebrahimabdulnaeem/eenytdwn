@@ -3,32 +3,24 @@
   "builds": [
     {
       "src": "package.json",
-      "use": "@vercel/static-build",
+      "use": "@vercel/node",
       "config": {
-        "distDir": "build"
+        "maxLambdaSize": "50mb"
       }
     }
   ],
   "routes": [
     {
-      "src": "/static/(.*)",
-      "dest": "/static/$1"
-    },
-    {
-      "src": "/favicon.ico",
-      "dest": "/favicon.ico"
-    },
-    {
-      "src": "/manifest.json",
-      "dest": "/manifest.json"
-    },
-    {
-      "src": "/robots.txt",
-      "dest": "/robots.txt"
-    },
-    {
       "src": "/(.*)",
-      "dest": "/index.html"
+      "dest": "/"
     }
-  ]
+  ],
+  "env": {
+    "REACT_APP_API_URL": "https://crocus-rogue-frost.glitch.me"
+  },
+  "build": {
+    "env": {
+      "REACT_APP_API_URL": "https://crocus-rogue-frost.glitch.me"
+    }
+  }
 } 
